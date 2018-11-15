@@ -52,25 +52,7 @@ foreach ($xxxx as $k) {
     $f = $data1['market_price'];
     $g = $data1['cat_id'];
 
-//    var_dump($a);
-//    die();
-
-    $database = [
-        'driver' => 'mysql',
-        'host' => $redBird['host'],
-        'database' => $redBird['database'],
-        'username' => $redBird['user'],
-        'password' => $redBird['password'],
-        'charset' => 'utf8',
-        'collation' => 'utf8_unicode_ci',
-        'prefix' => '',
-    ];
-
-    $capsule = new \Illuminate\Database\Capsule\Manager();
-    $capsule->addConnection($database);
-    $capsule->setAsGlobal();
-    $capsule->bootEloquent();
-    $x = $capsule::table('shop_goods')->insert([
+    Database($redBird)::table('shop_goods')->insert([
         'goods_id' => $a,
         'goods_sn' => $b,
         'goods_name' => $c,
@@ -79,31 +61,6 @@ foreach ($xxxx as $k) {
         'goods_max_price' => $f,
         'type_id' => $g
     ]);
-    dd($x);
-
-
-//    $ifexists = mysqli_query($redBirdConn, "select count(*) from shop_goods where goods_id=$k");
-//
-//    $sql = "insert into boa.shop_goods (goods_id,goods_sn,goods_name,goods_price,goods_detail,goods_max_price,type_id) values('".$a."',"."$b,$c,$d,$e,$f,$g)";
-//
-//    dd($sql);
-//    try{
-//        $insertResult = mysqli_query($redBirdConn, $sql);
-//
-//    }catch (mysqli_sql_exception $e){
-//        echo $e->getMessage();
-//    }
-//
-//    dd($insertResult);
-//    if ($ifexists) {
-//        echo $k;
-//    } else {
-//        echo 12313123;
-//        $insertResult = mysqli_query($redBirdConn, "insert into boa.shop_goods (goods_id,goods_sn,goods_name,goods_price,goods_detail,goods_max_price,type_id) values($a,$b,$c,$d,$e,$f,$g)");
-//        dd($insertResult);
-//    }
-//    $client->sadd('redBird', $k);
-
 }
 
 
@@ -118,5 +75,41 @@ function Sqlconn($config)
         die('Could not connect: ' . mysqli_error());
     } else {
         return $conn;
+    }
+}
+
+
+function Database($config)
+{
+    $database = [
+        'driver' => 'mysql',
+        'host' => $config['host'],
+        'database' => $config['database'],
+        'username' => $config['user'],
+        'password' => $config['password'],
+        'charset' => 'utf8',
+        'collation' => 'utf8_unicode_ci',
+        'prefix' => '',
+    ];
+
+    $capsule = new \Illuminate\Database\Capsule\Manager();
+    $capsule->addConnection($database);
+    $capsule->setAsGlobal();
+    $capsule->bootEloquent();
+    return $capsule;
+}
+
+
+//
+class Database{
+    private $instance;
+    public function getInstance(){
+        if ($this->instance!=null){
+            return $this->instance;
+        }
+        return new self();
+    }
+    public function RedConnection(){
+
     }
 }

@@ -1,20 +1,25 @@
 {
-    "name": "123456/mysql_sync",
-    "authors": [
-        {
-            "name": "pokerface",
-            "email": "189174944@qq.com"
-        }
-    ],
-    "require": {
-        "symfony/var-dumper": "^4.1",
-        "predis/predis": "^1.1",
-        "cviebrock/eloquent-sluggable": "^4.6"
-    },
-    "repositories": {
-        "packagist": {
-            "type": "composer",
-            "url": "https://packagist.phpcomposer.com"
-        }
+  "name": "123456/mysql_sync",
+  "authors": [
+    {
+      "name": "pokerface",
+      "email": "189174944@qq.com"
     }
+  ],
+  "require": {
+    "symfony/var-dumper": "^4.1",
+    "predis/predis": "^1.1",
+    "cviebrock/eloquent-sluggable": "^4.6"
+  },
+  "autoload": {
+    "psr-4": {
+      "Test\\": "src"
+    }
+  },
+  "repositories": {
+    "packagist": {
+      "type": "composer",
+      "url": "https://packagist.phpcomposer.com"
+    }
+  }
 }

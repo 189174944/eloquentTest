@@ -39,31 +39,26 @@ if (true) {
 $xxxx = $client->sdiff(['ecshop', 'redBird']);
 
 foreach ($xxxx as $k) {
-//    echo $k;
-    $data = mysqli_query($ecshopConn, "select goods_id,goods_sn,goods_name,shop_price,keywords,market_price,cat_id from sanshiyuan.ecs_goods where goods_id=$k ");
+    $data = mysqli_query($ecshopConn, "select * from sanshiyuan.ecs_goods where goods_id=$k ");
     $data1 = mysqli_fetch_array($data, MYSQLI_ASSOC);
-    $result222 = implode(',', array_values($data1));
-
-    $a = $data1['goods_id'];
-    $b = $data1['goods_sn'];
-    $c = $data1['goods_name'];
-    $d = $data1['shop_price'];
-    $e = $data1['keywords'];
-    $f = $data1['market_price'];
-    $g = $data1['cat_id'];
-
     Database($redBird)::table('shop_goods')->insert([
-        'goods_id' => $a,
-        'goods_sn' => $b,
-        'goods_name' => $c,
-        'goods_price' => $d,
-        'goods_detail' => $e,
-        'goods_max_price' => $f,
-        'type_id' => $g
+        'goods_id' => $data1['goods_id'],
+        'goods_sn' => $data1['goods_sn'],
+        'goods_name' => $data1['goods_name'],
+        'goods_price' => $data1['shop_price'],
+        'goods_detail' => $data1['keywords'],
+        'goods_max_price' => $data1['market_price'],
+        'type_id' => $data1['cat_id'],
+        'store_id'=>17,
+        'goods_img'=>$data1['goods_thumb'],
+        'goods_images'=>$data1['goods_img'],
+        'user_id'=>1052,
+        'market_price'=>$data1['market_price'],
+        'tb_url'=>$data1['tb_url'],
+        'goods_img2'=>$data1['goods_img'],
+        'goods_img3'=>$data1['original_img'],
     ]);
 }
-
-
 //dd($result);
 
 
@@ -101,15 +96,20 @@ function Database($config)
 
 
 //
-class Database{
+class Database
+{
     private $instance;
-    public function getInstance(){
-        if ($this->instance!=null){
+
+    public function getInstance()
+    {
+        if ($this->instance != null) {
             return $this->instance;
         }
         return new self();
     }
-    public function RedConnection(){
+
+    public function RedConnection()
+    {
 
     }
 }

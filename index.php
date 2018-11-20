@@ -11,6 +11,17 @@ $client = new Predis\Client([
     'port' => 6379
 ]);
 
+while (1) {
+    $a = $client->lpop('list');
+    if ($a) {
+        echo '处理\n';
+    }
+    if (!$a) {
+        sleep(1);
+    }
+}
+dd();
+
 
 $ecshop = $mysql['ecshop'];
 $redBird = $mysql['redBird'];
@@ -41,6 +52,10 @@ if (true) {
 
 //求两个数据表的差集
 $xxxx = $client->sdiff(['ecshop', 'redBird']);
+$y = $client->sdiff(['ecshop', 'redBird']);
+
+Database($redBird)::table('shop_goods')->whereIn('goods_id', $y)->delete();
+
 
 $ids = implode(',', $xxxx);
 
@@ -71,7 +86,7 @@ if ($data) {
     $table = Database($redBird)::table('shop_goods');
     foreach ($dataArray as $k) {
         $table->insert($k);
-        echo '正在迁移数据'.$k['goods_id'].PHP_EOL;
+        echo '正在迁移数据' . $k['goods_id'] . PHP_EOL;
     }
 }
 
@@ -79,7 +94,7 @@ if ($data) {
 $xxxx = $client->sdiff(['ecshopUpdate', 'redBirdUpdate']);
 
 if (!$xxxx) {
-    echo '没有需要更新的数据'.PHP_EOL;
+    echo '没有需要更新的数据' . PHP_EOL;
 }
 
 //开始更新
@@ -111,7 +126,7 @@ foreach ($xxxx as $k) {
         'goods_img3' => $data->original_img,
         'updated_at' => $data->updated_at
     ]);
-    echo '正在更新数据:'.$id.PHP_EOL;
+    echo '正在更新数据:' . $id . PHP_EOL;
 
 }
 
@@ -147,10 +162,10 @@ function Database($config)
 }
 
 
-foreach ($client->smembers('redBirdUpdate') as $k){
-    $client->srem('redBirdUpdate',$k);
+foreach ($client->smembers('redBirdUpdate') as $k) {
+    $client->srem('redBirdUpdate', $k);
 }
-foreach ($client->smembers('ecshopUpdate') as $k){
-    $client->srem('ecshopUpdate',$k);
+foreach ($client->smembers('ecshopUpdate') as $k) {
+    $client->srem('ecshopUpdate', $k);
 }
 

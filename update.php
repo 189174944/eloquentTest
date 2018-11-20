@@ -13,7 +13,6 @@ while (1) {
     $id = $client->lpop('myTask');
     if ($id) {
         synchronous($config, $id);
-//        echo '更新了一条数据' . $a . PHP_EOL;
     }
     if (!$id) {
         sleep(1);
@@ -52,10 +51,10 @@ function synchronous($config, $id)
     ];
     $redBirdTable = Database($redBird)::table('shop_goods')->where('goods_id', $id);
     if ($redBirdTable->count() > 0) {
-        echo 111;
+        echo '更新了goods_id=' . $id . '的数据!' . PHP_EOL;
         $redBirdTable->update(array_except($data, 'goods_id'));
     } else {
-        echo 222;
+        echo '插入了goods_id=' . $id . '的数据!' . PHP_EOL;
         $redBirdTable->insert($data);
     }
 }

@@ -15,7 +15,6 @@ $redBird = $mysql['redBird'];
 
 $ecshopConn = Sqlconn($ecshop);
 $redBirdConn = Sqlconn($redBird);
-
 $tag = false;
 $client->flushall();
 
@@ -23,6 +22,7 @@ if (true) {
     //ECshop id集合
     $ecshopResult = mysqli_query($ecshopConn, 'select goods_id,updated_at from ecs_goods');
 //    mysqli_close($ecshopConn);
+
     while ($row = mysqli_fetch_array($ecshopResult, MYSQLI_NUM)) {
         $client->sadd('ecshop', $row[0]);
         $client->sadd('ecshopUpdate', $row[0] . '*' . $row[1]);
@@ -41,7 +41,7 @@ if (true) {
 $xxxx = $client->sdiff(['ecshop', 'redBird']);
 $y = $client->sdiff(['ecshop', 'redBird']);
 
-Database($redBird)::table('shop_goods')->whereIn('goods_id', $y)->delete();
+//Database($redBird)::table('shop_goods')->whereIn('goods_id', $y)->delete();
 
 
 $ids = implode(',', $xxxx);
@@ -78,9 +78,9 @@ if ($data) {
 }
 
 //求需要更新的数据项
-$xxxx = $client->sdiff(['ecshopUpdate', 'redBirdUpdate']);
+$yyyy = $client->sdiff(['ecshopUpdate', 'redBirdUpdate']);
 
-if (!$xxxx) {
+if (!$yyyy) {
     echo '没有需要更新的数据' . PHP_EOL;
 }
 

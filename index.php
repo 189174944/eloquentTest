@@ -3,6 +3,7 @@ $mysql = require './config.php';
 include './vendor/autoload.php';
 include './helpers.php';
 @set_time_limit(0);
+@ignore_user_abort(1);
 
 $client = new Predis\Client([
     'scheme' => 'tcp',
@@ -39,17 +40,14 @@ if (true) {
 
 //求两个数据表的差集
 $xxxx = $client->sdiff(['ecshop', 'redBird']);
-$y = $client->sdiff(['ecshop', 'redBird']);
 
-//Database($redBird)::table('shop_goods')->whereIn('goods_id', $y)->delete();
-
+Database($redBird)::table('shop_goods')->whereIn('goods_id', $xxxx)->delete();
 
 $ids = implode(',', $xxxx);
 
 $data = mysqli_query($ecshopConn, "select * from sanshiyuan.ecs_goods where goods_id in ($ids)");
 if ($data) {
     $dataArray = [];
-
     while ($row = mysqli_fetch_array($data, MYSQLI_ASSOC)) {
         array_push($dataArray, [
             'goods_id' => $row['goods_id'],
@@ -76,7 +74,6 @@ if ($data) {
         echo '正在迁移数据' . $k['goods_id'] . PHP_EOL;
     }
 }
-
 //求需要更新的数据项
 $yyyy = $client->sdiff(['ecshopUpdate', 'redBirdUpdate']);
 
@@ -88,14 +85,18 @@ if (!$yyyy) {
 //$redBird1 = Database($redBird)::table('shop_goods');
 //$ecshop1 = Database($ecshop)::table('ecs_goods');
 
-foreach ($xxxx as $k) {
+$willUpdateData = [];
+foreach ($yyyy as $k) {
     $id = explode('*', $k)[0];
-//    echo $k[0];
-//    echo $k[1];
-//    echo "<br>";
+    array_push($willUpdateData, $id);
+//    $data = Database($ecshop)::table('ecs_goods')->where('goods_id', $id)->first();
+}
+$dataSet = Database($ecshop)::table('ecs_goods')->whereIn('goods_id', $willUpdateData)->get();
 
-    $data = Database($ecshop)::table('ecs_goods')->where('goods_id', $id)->first();
-    Database($redBird)::table('shop_goods')->where('goods_id', $id)->update([
+$redBirdDataBase = Database($redBird);
+
+foreach ($dataSet as $data) {
+    $redBirdDataBase::table('shop_goods')->where('goods_id', $data->goods_id)->update([
 //        'goods_id' => $data->goods_id,
         'goods_sn' => $data->goods_sn,
         'goods_name' => $data->goods_name,
@@ -114,7 +115,6 @@ foreach ($xxxx as $k) {
         'updated_at' => $data->updated_at
     ]);
     echo '正在更新数据:' . $id . PHP_EOL;
-
 }
 
 function Sqlconn($config)

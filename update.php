@@ -3,6 +3,8 @@ $config = require './config.php';
 include './vendor/autoload.php';
 include './helpers.php';
 
+@ignore_user_abort(1);
+@set_time_limit(0);
 $client = new Predis\Client([
     'scheme' => 'tcp',
     'host' => '127.0.0.1',

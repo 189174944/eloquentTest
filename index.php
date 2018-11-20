@@ -2,7 +2,6 @@
 $mysql = require './config.php';
 include './vendor/autoload.php';
 include './helpers.php';
-
 @set_time_limit(0);
 
 $client = new Predis\Client([
@@ -10,18 +9,6 @@ $client = new Predis\Client([
     'host' => '127.0.0.1',
     'port' => 6379
 ]);
-
-while (1) {
-    $a = $client->lpop('list');
-    if ($a) {
-        echo '处理\n';
-    }
-    if (!$a) {
-        sleep(1);
-    }
-}
-dd();
-
 
 $ecshop = $mysql['ecshop'];
 $redBird = $mysql['redBird'];

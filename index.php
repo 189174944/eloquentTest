@@ -2,6 +2,8 @@
 $mysql = require './config.php';
 include './vendor/autoload.php';
 include './helpers.php';
+
+ini_set('memory_limit', '1280M');
 @set_time_limit(0);
 @ignore_user_abort(1);
 
@@ -58,8 +60,20 @@ if ($data) {
             'goods_max_price' => $row['market_price'],
             'type_id' => $row['cat_id'],
             'store_id' => 17,
-            'goods_img' => $row['goods_thumb'],
-            'goods_images' => $row['goods_img'],
+            'goods_img' => 'http://ovuhrv8k3.bkt.clouddn.com/images/processing/' . $row['goods_sn'] . '/' . $row['goods_sn'] . '001.JPG',
+            'goods_images' => (function () use ($row) {
+                $str = '';
+                for ($i = 1; $i < 8; $i++) {
+                    $url = 'http://ovuhrv8k3.bkt.clouddn.com/images/processing/' . $row['goods_sn'] . '/' . $row['goods_sn'] . '00' . $i . '.JPG';
+                    $str .= $url;
+                    if ($i < 7) {
+                        $str .= $url . ',';
+                    } else {
+                        $str .= $url;
+                    }
+                }
+                return $str;
+            })(),
             'user_id' => 1052,
             'market_price' => $row['market_price'],
             'tb_url' => $row['tb_url'],
@@ -105,8 +119,15 @@ foreach ($dataSet as $data) {
         'goods_max_price' => $data->market_price,
         'type_id' => $data->cat_id,
         'store_id' => 17,
-        'goods_img' => $data->goods_thumb,
-        'goods_images' => $data->goods_img,
+        'goods_img' => 'http://ovuhrv8k3.bkt.clouddn.com/images/processing/' . $data->goods_sn . '/' . $data->goods_sn . '001.JPG',
+        'goods_images' => (function () use ($data) {
+            $str = '';
+            for ($i = 1; $i < 8; $i++) {
+                $url = 'http://ovuhrv8k3.bkt.clouddn.com/images/processing/' . $data->goods_sn . '/' . $data->goods_sn . '00' . $i . '.JPG';
+                $str .= $url;
+            }
+            return $str;
+        })(),
         'user_id' => 1052,
         'market_price' => $data->market_price,
         'tb_url' => $data->tb_url,

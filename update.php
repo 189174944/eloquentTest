@@ -42,8 +42,15 @@ function synchronous($config, $id)
         'goods_max_price' => $data->market_price,
         'type_id' => $data->cat_id,
         'store_id' => 17,
-        'goods_img' => $data->goods_thumb,
-        'goods_images' => $data->goods_img,
+        'goods_img' => 'http://ovuhrv8k3.bkt.clouddn.com/images/processing/' . $data->goods_sn . '/' . $data->goods_sn . '001.JPG',
+        'goods_images' => (function () use ($data) {
+            $str = '';
+            for ($i = 1; $i < 8; $i++) {
+                $url = 'http://ovuhrv8k3.bkt.clouddn.com/images/processing/' . $data->goods_sn . '/' . $data->goods_sn . '00' . $i . '.JPG';
+                $str .= $url;
+            }
+            return $str;
+        })(),
         'user_id' => 1052,
         'market_price' => $data->market_price,
         'tb_url' => $data->tb_url,

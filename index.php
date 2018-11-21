@@ -42,8 +42,8 @@ if (true) {
 
 //求两个数据表的差集
 $xxxx = $client->sdiff(['ecshop', 'redBird']);
-
-Database($redBird)::table('shop_goods')->whereIn('goods_id', $xxxx)->delete();
+//
+//Database($redBird)::table('shop_goods')->whereIn('goods_id', $xxxx)->delete();
 
 $ids = implode(',', $xxxx);
 
@@ -60,32 +60,49 @@ if ($data) {
             'goods_max_price' => $row['market_price'],
             'type_id' => $row['cat_id'],
             'store_id' => 17,
-            'goods_img' => 'http://ovuhrv8k3.bkt.clouddn.com/images/processing/' . $row['goods_sn'] . '/' . $row['goods_sn'] . '001.JPG',
-            'goods_images' => (function () use ($row) {
-                $str = '';
+            'goods_img' => 'http://ovuhrv8k3.bkt.clouddn.com/' . $row['goods_thumb'],
+            'goods_imgs' => (function () use ($row) {
+                $arr = [];
                 for ($i = 1; $i < 8; $i++) {
                     $url = 'http://ovuhrv8k3.bkt.clouddn.com/images/processing/' . $row['goods_sn'] . '/' . $row['goods_sn'] . '00' . $i . '.JPG';
-                    $str .= $url;
-                    if ($i < 7) {
-                        $str .= $url . ',';
-                    } else {
-                        $str .= $url;
-                    }
+                    array_push($arr, $url);
                 }
-                return $str;
+                return implode(',', $arr);
             })(),
             'user_id' => 1052,
             'market_price' => $row['market_price'],
             'tb_url' => $row['tb_url'],
-            'goods_img2' => $row['goods_img'],
-            'goods_img3' => $row['original_img'],
-            'updated_at' => $row['updated_at']
+            'goods_img2' => 'http://ovuhrv8k3.bkt.clouddn.com/' . $row['goods_img'],
+            'goods_img3' => 'http://ovuhrv8k3.bkt.clouddn.com/' . $row['original_img'],
+            'updated_at' => $row['updated_at'],
+            'goods_stock' => $row['goods_number']
         ]);
     }
     $table = Database($redBird)::table('shop_goods');
+    $shop_goods_sku = Database($redBird)::table('shop_goods_sku');
+    $shop_goods_spec = Database($redBird)::table('shop_goods_spec');
+
     foreach ($dataArray as $k) {
         $table->insert($k);
-        echo '正在迁移数据' . $k['goods_id'] . PHP_EOL;
+        $shop_goods_sku->insert([
+            'goods_id' => $k['goods_id'],
+            'spec_ids' => $k['goods_id'],
+            'price' => $k['goods_price'],
+            'market_price' => $k['market_price'],
+            'spec_text' => "数量:1个",
+            'stock' => 1,
+            'store_id' => 17
+        ]);
+        $shop_goods_spec->insert([
+            'id' => $k['goods_id'],
+            'goods_id' => $k['goods_id'],
+            'spec_group' => "数量",
+            'spec_value' => "1个",
+            'store_id' => 17,
+            'create_time' => "1533353650",
+            'update_time' => "1533353650"
+        ]);
+        echo '正在迁移数据 goods_id=' . $k['goods_id'] . ' 的数据!' . PHP_EOL;
     }
 }
 //求需要更新的数据项
@@ -119,23 +136,40 @@ foreach ($dataSet as $data) {
         'goods_max_price' => $data->market_price,
         'type_id' => $data->cat_id,
         'store_id' => 17,
-        'goods_img' => 'http://ovuhrv8k3.bkt.clouddn.com/images/processing/' . $data->goods_sn . '/' . $data->goods_sn . '001.JPG',
-        'goods_images' => (function () use ($data) {
-            $str = '';
+        'goods_img' => 'http://ovuhrv8k3.bkt.clouddn.com/' . $data->goods_thumb,
+        'goods_imgs' => (function () use ($data) {
+            $arr = [];
             for ($i = 1; $i < 8; $i++) {
                 $url = 'http://ovuhrv8k3.bkt.clouddn.com/images/processing/' . $data->goods_sn . '/' . $data->goods_sn . '00' . $i . '.JPG';
-                $str .= $url;
+                array_push($arr, $url);
             }
-            return $str;
+            return implode(',', $arr);
         })(),
         'user_id' => 1052,
         'market_price' => $data->market_price,
         'tb_url' => $data->tb_url,
-        'goods_img2' => $data->goods_img,
-        'goods_img3' => $data->original_img,
-        'updated_at' => $data->updated_at
+        'goods_img2' => 'http://ovuhrv8k3.bkt.clouddn.com/' . $data->goods_img,
+        'goods_img3' => 'http://ovuhrv8k3.bkt.clouddn.com/' . $data->original_img,
+        'updated_at' => $data->updated_at,
+        'goods_stock' => $data->goods_number
     ]);
-    echo '正在更新数据:' . $id . PHP_EOL;
+    $redBirdDataBase::table('shop_goods_sku')->where('goods_id', $data->goods_id)->update([
+        'spec_ids' => $data->goods_id,
+        'price' => $data->shop_price,
+        'market_price' => $data->market_price,
+        'spec_text' => "数量:1个",
+        'stock' => 1,
+        'store_id' => 17
+    ]);
+    $redBirdDataBase::table('shop_goods_spec')->where('goods_id', $data->goods_id)->update([
+        'id' => $data->goods_id,
+        'spec_group' => "数量",
+        'spec_value' => "1个",
+        'store_id' => 17,
+        'create_time' => "1533353650",
+        'update_time' => "1533353650"
+    ]);
+    echo '正在更新 goods_id=' . $data->goods_id . '的数据' . PHP_EOL;
 }
 
 function Sqlconn($config)
@@ -175,5 +209,11 @@ foreach ($client->smembers('redBirdUpdate') as $k) {
 }
 foreach ($client->smembers('ecshopUpdate') as $k) {
     $client->srem('ecshopUpdate', $k);
+}
+foreach ($client->smembers('ecshop') as $k) {
+    $client->srem('ecshop', $k);
+}
+foreach ($client->smembers('ecshopUpdate') as $k) {
+    $client->srem('redBird', $k);
 }
 
